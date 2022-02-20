@@ -1,0 +1,34 @@
+tr.view {
+	background: #111;
+}
+html {
+	background: #111;
+}
+#board {
+	background-color: blue;
+	margin: auto;
+}
+
+td {
+	cursor: pointer;
+}
+
+td.drop {
+	background: #FFF;
+	border-radius: 50%;
+}
+td.red {
+	background: red;
+	border-radius: 50%;
+}
+td.yellow {
+	background: yellow;
+	border-radius: 50%;
+}
+
+.popup {
+	position: absolute;
+	background: grey;
+	opacity: 0.95;
+	text-align: center;
+}

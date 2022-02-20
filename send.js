@@ -1,10 +1,13 @@
 const socket = new WebSocket('ws://kpow2.com:7777/connect-verses');
 let lookingForMatch = false;
 let waitingForOpponent = false;
-const myId = crypto.randomUUID();
+const myId = uuidv4();
 let yourId = "";
 let startTime = "";
-let loPings = localStorage.getItem("kpow2Pings");
+loPings = [];
+if(localStorage.getItem('kpow2Pings') != null){
+	loPings = JSON.parse(localStorage.getItem('kpow2Pings'));
+}
 let opponentTurn = false;
 let turnPlayed = false;
 
@@ -68,5 +71,14 @@ function sendTurn(c) {
 		loadingpop.style.display = "block";
 		turnPlayed = true;
 	}
+	
+	startTime = Date.now();
+	socket.send('ping');
+}
+
+function uuidv4() {
+	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+		(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+	);
 }
 

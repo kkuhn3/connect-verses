@@ -61,12 +61,15 @@ function queueUp() {
 	startPop.style.display = "none";
 	loadingpop.style.display = "block";
 	loadingpop.innerHTML = "Looking for an opponent ...";
+	start();
+	resize();
 }
 
 function onAI() {
 	startPop.style.display = "none";
 	vsAi = true;
-	//mycolor = "yellow";
+	start();
+	resize();
 }
 
 function sendTurn(c) {

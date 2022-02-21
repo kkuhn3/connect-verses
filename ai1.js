@@ -29,42 +29,48 @@ function minimax(aBoard, color, depth, specificTurn) {
 		opposingColor = "red";
 	}
 	if(depth === 0) {
-		return [0, heuristic(aBoard, color) - heuristic(aBoard, opposingColor)];
+		return [-1, heuristic(aBoard, color) - heuristic(aBoard, opposingColor)];
 	}
 	if(checkGameOver(aBoard)) {
-		return [0, heuristic(aBoard, color) - heuristic(aBoard, opposingColor)];
+		return [-1, heuristic(aBoard, color) - heuristic(aBoard, opposingColor)];
 	}
 	
 	// Max player
 	if(turnArr[specificTurn % 4] === color) {
 		let bestScore = -1 * Number.MAX_SAFE_INTEGER;
-		let bestCol = 0;
+		let bestCols = [];
 		for(let c = 0; c < width; c++) {
-			let evalBoard = aBoard.cloneNode(true);
-			dropPiece(c, color, evalBoard);
-			const result = minimax(evalBoard, color, depth-1, specificTurn+1);
-			if(result[1] > bestScore) {
-				bestScore = result[1];
-				bestCol = c;
+			if(aBoard.rows[1].getElementsByTagName("td")[c].className === "drop") {
+				let evalBoard = aBoard.cloneNode(true);
+				dropPiece(c, color, evalBoard);
+				const result = minimax(evalBoard, color, depth-1, specificTurn+1);
+				if(result[1] > bestScore) {
+					bestScore = result[1];
+					bestCols = [c];
+				}
+				else if(result[1] === bestScore) {
+					bestCols.push(c);
+				}
 			}
 		}
+		let bestCol = bestCols[Math.floor(Math.random() * bestCols.length)];
 		return [bestCol, bestScore];
 	}
 	
 	// Min player
 	else {
 		let bestScore = Number.MAX_SAFE_INTEGER;
-		let bestCol = 0;
 		for(let c = 0; c < width; c++) {
-			let evalBoard = aBoard.cloneNode(true);
-			dropPiece(c, opposingColor, evalBoard);
-			const result = minimax(evalBoard, color, depth-1, specificTurn+1);
-			if(result[1] < bestScore) {
-				bestScore = result[1];
-				bestCol = c;
+			if(aBoard.rows[1].getElementsByTagName("td")[c].className === "drop") {
+				let evalBoard = aBoard.cloneNode(true);
+				dropPiece(c, opposingColor, evalBoard);
+				const result = minimax(evalBoard, color, depth-1, specificTurn+1);
+				if(result[1] < bestScore) {
+					bestScore = result[1];
+				}
 			}
 		}
-		return [bestCol, bestScore];
+		return [-1, bestScore];
 	}
 }
 

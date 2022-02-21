@@ -72,28 +72,28 @@ function resize() {
 function playTurn() {
 	if(turn % 2 === 1) {
 		if(mycolor === "red") {
-			dropPiece(mycolumn, mycolor);
-			dropPiece(opponentTurn.column, opponentTurn.mycolor); 
+			dropPiece(mycolumn, mycolor, board);
+			dropPiece(opponentTurn.column, opponentTurn.mycolor, board); 
 		}
 		else {
-			dropPiece(opponentTurn.column, opponentTurn.mycolor); 
-			dropPiece(mycolumn, mycolor);
+			dropPiece(opponentTurn.column, opponentTurn.mycolor, board); 
+			dropPiece(mycolumn, mycolor, board);
 		}
 	}
 	else {
 		if(mycolor === "red") {
-			dropPiece(opponentTurn.column, opponentTurn.mycolor); 
-			dropPiece(mycolumn, mycolor);
+			dropPiece(opponentTurn.column, opponentTurn.mycolor, board); 
+			dropPiece(mycolumn, mycolor, board);
 		}
 		else {
-			dropPiece(mycolumn, mycolor);
-			dropPiece(opponentTurn.column, opponentTurn.mycolor); 
+			dropPiece(mycolumn, mycolor, board);
+			dropPiece(opponentTurn.column, opponentTurn.mycolor, board); 
 		}
 	}
 	turn = turn + 1;
 	turnPlayed = false;
 	opponentTurn = false;
-	const isGameOver = checkGameOver();
+	const isGameOver = checkGameOver(board);
 	if(isGameOver) {
 		gameOver(isGameOver);
 	}
@@ -104,9 +104,9 @@ function canDropPiece(c) {
 	}
 	return false;
 }
-function dropPiece(c, color) {
+function dropPiece(c, color, aBoard) {
 	for(let r = height; r > 0; r--) {
-		let cell = board.rows[r].getElementsByTagName("td")[c];
+		let cell = aBoard.rows[r].getElementsByTagName("td")[c];
 		if(cell.className === "drop") {
 			cell.className = color;
 			return true;
@@ -118,36 +118,36 @@ function gameOver(winnerString) {
 	winningText.innerHTML = "Victory for: " + winnerString;
 }
 
-function checkGameOver() {
+function checkGameOver(aBoard) {
 	let isAtie = true;
 	for(let r = 1; r < height + 1; r++) {
 		for(let c = 0; c < width; c++) {
-			let cell = board.rows[r].getElementsByTagName("td")[c];
+			let cell = aBoard.rows[r].getElementsByTagName("td")[c];
 			if(cell.className === "red") {
-				if(countDown(r, c, "red") === connect) {
+				if(countDown(r, c, "red", aBoard) === connect) {
 					return "red";
 				}
-				if(countRight(r, c, "red") === connect) {
+				if(countRight(r, c, "red", aBoard) === connect) {
 					return "red";
 				}
-				if(countDownRight(r, c, "red") === connect) {
+				if(countDownRight(r, c, "red", aBoard) === connect) {
 					return "red";
 				}
-				if(countDownLeft(r, c, "red") === connect) {
+				if(countDownLeft(r, c, "red", aBoard) === connect) {
 					return "red";
 				}
 			}
 			else if(cell.className === "yellow") {
-				if(countDown(r, c, "yellow") === connect) {
+				if(countDown(r, c, "yellow", aBoard) === connect) {
 					return "yellow";
 				}
-				if(countRight(r, c, "yellow") === connect) {
+				if(countRight(r, c, "yellow", aBoard) === connect) {
 					return "yellow";
 				}
-				if(countDownRight(r, c, "yellow") === connect) {
+				if(countDownRight(r, c, "yellow", aBoard) === connect) {
 					return "yellow";
 				}
-				if(countDownLeft(r, c, "yellow") === connect) {
+				if(countDownLeft(r, c, "yellow", aBoard) === connect) {
 					return "yellow";
 				}
 			}
@@ -161,11 +161,11 @@ function checkGameOver() {
 	}
 	return false;
 }
-function countDown(r, c, color) {
+function countDown(r, c, color, aBoard) {
 	let count = 0;
 	for(let d = 0; d < connect; d++) {
 		if(r + d < height + 1) {
-			const cell = board.rows[r+d].getElementsByTagName("td")[c];
+			const cell = aBoard.rows[r+d].getElementsByTagName("td")[c];
 			if(cell.className === color) {
 				count = count + 1;
 			}
@@ -173,11 +173,11 @@ function countDown(r, c, color) {
 	}
 	return count;
 }
-function countRight(r, c, color) {
+function countRight(r, c, color, aBoard) {
 	let count = 0;
 	for(let d = 0; d < connect; d++) {
 		if(c + d < width) {
-			const cell = board.rows[r].getElementsByTagName("td")[c+d];
+			const cell = aBoard.rows[r].getElementsByTagName("td")[c+d];
 			if(cell.className === color) {
 				count = count + 1;
 			}
@@ -185,11 +185,11 @@ function countRight(r, c, color) {
 	}
 	return count;
 }
-function countDownRight(r, c, color) {
+function countDownRight(r, c, color, aBoard) {
 	let count = 0;
 	for(let d = 0; d < connect; d++) {
 		if(c + d < width && r + d < height + 1) {
-			const cell = board.rows[r+d].getElementsByTagName("td")[c+d];
+			const cell = aBoard.rows[r+d].getElementsByTagName("td")[c+d];
 			if(cell.className === color) {
 				count = count + 1;
 			}
@@ -197,11 +197,11 @@ function countDownRight(r, c, color) {
 	}
 	return count;
 }
-function countDownLeft(r, c, color) {
+function countDownLeft(r, c, color, aBoard) {
 	let count = 0;
 	for(let d = 0; d < connect; d++) {
 		if(c - d > -1 && r + d < height + 1) {
-			const cell = board.rows[r+d].getElementsByTagName("td")[c-d];
+			const cell = aBoard.rows[r+d].getElementsByTagName("td")[c-d];
 			if(cell.className === color) {
 				count = count + 1;
 			}

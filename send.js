@@ -10,6 +10,7 @@ if(localStorage.getItem('kpow2Pings') != null){
 }
 let opponentTurn = false;
 let turnPlayed = false;
+let vsAi = false;
 
 function socketStart() {
 	socket.addEventListener('open', function (event) {});
@@ -62,18 +63,34 @@ function queueUp() {
 	loadingpop.innerHTML = "Looking for an opponent ...";
 }
 
+function onAI() {
+	startPop.style.display = "none";
+	vsAi = true;
+	//mycolor = "yellow";
+}
+
 function sendTurn(c) {
-	socket.send('{"column":"'+c+'","mycolor":"'+mycolor+'","myId":"'+myId+'","yourId":"'+yourId+'"}');
-	if(opponentTurn) {
+	if(vsAi) {
+		opponentTurn = {
+			"column": aiTurn1(board.cloneNode(true), "yellow"),
+			"mycolor": "yellow"
+		};
 		playTurn();
 	}
 	else {
-		loadingpop.style.display = "block";
-		turnPlayed = true;
+		socket.send('{"column":"'+c+'","mycolor":"'+mycolor+'","myId":"'+myId+'","yourId":"'+yourId+'"}');
+		if(opponentTurn) {
+			playTurn();
+		}
+		else {
+			loadingpop.style.display = "block";
+			loadingpop.innerHTML = "Waiting for opponent ...";
+			turnPlayed = true;
+		}
+		
+		startTime = Date.now();
+		socket.send('ping');
 	}
-	
-	startTime = Date.now();
-	socket.send('ping');
 }
 
 function uuidv4() {

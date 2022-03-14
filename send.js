@@ -1,8 +1,4 @@
-const socket = new WebSocket('ws://kpow2.com:7777/connect-verses');
-let lookingForMatch = false;
-let waitingForOpponent = false;
-const myId = uuidv4();
-let yourId = "";
+let socket = null;
 let startTime = "";
 loPings = [];
 if(localStorage.getItem('kpow2Pings') != null){
@@ -13,7 +9,11 @@ let turnPlayed = false;
 let vsAi = false;
 
 function socketStart() {
-	socket.addEventListener('open', function (event) {});
+	socket = new WebSocket("ws://kpow2.com:7979");
+
+	socket.addEventListener('open', function (event) {
+		socket.send('{"subscribe":"connectverses"}');
+	});
 
 	socket.addEventListener('message', function (event) {
 		console.log(event.data);
@@ -25,30 +25,19 @@ function socketStart() {
 		}
 		else {
 			msgObj = JSON.parse(event.data);
-			if(lookingForMatch && msgObj.queueing) {
-				if(width == msgObj.width &&
-					height == msgObj.height &&
-					connect == msgObj.connect) {
-						yourId = msgObj.myId;
-						lookingForMatch = false;
-						socket.send('{"match":"'+true+'","myId":"'+myId+'","yourId":"'+yourId+'"}');
-						mycolor = "red";
-						loadingpop.style.display = "none";
-				}
+			if(msgObj.match === 1) {
+				mycolor = "red";
+				loadingpop.style.display = "none";
 			}
-			else if(msgObj.yourId === myId) {
-				if(msgObj.match && msgObj.yourId === myId) {
-					lookingForMatch = false;
-					yourId = msgObj.myId;
-					mycolor = "yellow";
-					loadingpop.style.display = "none";
-				}
-				else if(msgObj.column) {
-					loadingpop.style.display = "none";
-					opponentTurn = msgObj;
-					if(turnPlayed) {
-						playTurn();
-					}
+			else if(msgObj.match === 2) {
+				mycolor = "yellow";
+				loadingpop.style.display = "none";
+			}
+			else if(msgObj.column) {
+				loadingpop.style.display = "none";
+				opponentTurn = msgObj;
+				if(turnPlayed) {
+					playTurn();
 				}
 			}
 		}
@@ -56,13 +45,12 @@ function socketStart() {
 }
 
 function queueUp() {
-	socket.send('{"queueing":"'+true+'","myId":"'+myId+'","width":"'+width+'","height":"'+height+'","connect":"'+connect+'"}');
-	lookingForMatch = true;
+	start();
+	resize();
+	socket.send('{"queue":"connectverses'+width+''+height+''+connect+'"}');
 	startPop.style.display = "none";
 	loadingpop.style.display = "block";
 	loadingpop.innerHTML = "Looking for an opponent ...";
-	start();
-	resize();
 }
 
 function onAI() {
@@ -81,7 +69,7 @@ function sendTurn(c) {
 		playTurn();
 	}
 	else {
-		socket.send('{"column":"'+c+'","mycolor":"'+mycolor+'","myId":"'+myId+'","yourId":"'+yourId+'"}');
+		socket.send('{"column":"'+c+'","mycolor":"'+mycolor+'"}');
 		if(opponentTurn) {
 			playTurn();
 		}
@@ -95,10 +83,3 @@ function sendTurn(c) {
 		socket.send('ping');
 	}
 }
-
-function uuidv4() {
-	return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
-		(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-	);
-}
-

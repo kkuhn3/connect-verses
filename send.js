@@ -9,14 +9,14 @@ let turnPlayed = false;
 let vsAi = false;
 
 function socketStart() {
-	socket = new WebSocket("ws://kpow2.com:7979");
+	socket = new WebSocket(websocketURL);
 
 	socket.addEventListener('open', function (event) {
 		socket.send('{"subscribe":"connectverses"}');
 	});
 
 	socket.addEventListener('message', function (event) {
-		console.log(event.data);
+		//console.log(event.data);
 		if(event.data === "pong") {
 			let endTime = Date.now();
 			let delta = endTime - startTime;
